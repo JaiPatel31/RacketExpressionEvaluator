@@ -1,0 +1,22 @@
+#lang racket
+(require data/maybe)
+
+(define (safe-div x y)  ; int int -> maybe int 
+  (if (= y 0)
+      nothing
+      (just (quotient x y))))
+
+(define (eval2 expr)
+  (cond
+    [(equal? (first expr) 'int) (just (second expr))]
+    [(equal? (first expr) 'div)
+     (let(
+          [x (eval2 (second expr))]
+          [y (eval2 (third  expr))])
+       (if (or (equal? x nothing) (equal? y nothing))
+           nothing
+           (safe-div (from-just 1 x) (from-just 1 y))))]))
+
+
+;(eval2 '(div (int 10) (int 2)))
+(eval2 '(div (int 10) (div (int 4)(div (div (int 100) (int 10)) (int 5)))))
